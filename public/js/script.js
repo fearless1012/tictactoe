@@ -4,11 +4,19 @@ var CellCollection = Backbone.Collection.extend({
 });
 var CellView = Backbone.View.extend({
 	tagName: "div",
-	className: "Tcell",
+	className: "Tcell span_1_of_9",
 	template: _.template($("#tmpl_cell").html()),
 	events: {
 		'click' : function(e) {
-			console.log("click" + this.i + " " + this.j );
+			var x = this.model.get('x');
+			var y = this.model.get('y');
+			console.log(x + " " + y);
+		},
+		'mouseover': function(e) {
+			$(this.el).css("background","white");
+		},
+		'mouseout': function(e) {
+			$(this.el).css("background","black");
 		}
 	},
 	render: function() {
@@ -27,7 +35,7 @@ var RowView = Backbone.View.extend({
 		for(var i=0;i<9;i++) {
 			var cell = new CellView({
 				model: new Cell({
-					x: this.i,
+					x: this.model.get('x'),
 					y: i
 				})
 			});
@@ -49,7 +57,7 @@ var BoardView = Backbone.View.extend({
 		for(var i=0;i<9;i++) {
 			var row = new RowView({
 				model: new Row({
-					i: i
+					x: i
 				})
 			});
 			this.$el.append(row.render());
