@@ -1,12 +1,12 @@
 {
-  "name": "application-name",
+  "name": "ultimate-tic-tac-toe",
   "version": "0.0.1",
   "private": true,
   "scripts": {
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "3.2.6",
+    "express": "3.x",
     "ejs": "*"
   }
 }
