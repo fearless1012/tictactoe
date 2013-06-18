@@ -1,5 +1,27 @@
 /*CSS document*/
 
-.Tcell {
-	background: black;
+body {
+	max-width: 1024px;
+}
+.container {
+	width: 360px;
+	margin: auto;
+}
+.Tcell{
+	display: block;
+	width: 30px;
+	height: 30px;
+	border: solid 1px white;
+	padding: 4px;
+	float: left;
+	background: #eee;
+}
+.Tcell:hover { cursor: pointer; }
+/*.Trow div:nth-child(3), .Trow div:nth-child(6) { border-right:solid 1px black; }*/
+.Trow div:nth-child(4), .Trow div:nth-child(7) { border-left:solid 1px black; }
+/*.container div.Trow:nth-child(3), .container div.Trow:nth-child(6) { border-bottom: solid 1px black; }*/
+.container div.Trow:nth-child(4), .container div.Trow:nth-child(7) { border-top: solid 1px black; }
+
+.Trow {
+	clear:both;
 }
