@@ -7,6 +7,8 @@ var express = require('express'),
 	store = new express.session.MemoryStore();
 	game = require('./game.js');
 
+
+
 var app = express();
 
 // all environments
@@ -14,7 +16,7 @@ app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.favicon());
-app.use(express.logger('dev'));
+//app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser('blah blah blah'));
@@ -32,6 +34,21 @@ if ('development' == app.get('env')) {
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+
+app.get('/:room', function(req, res) {
+	if(!req.params['room']) return false;
+	var name=req.params['room'];
+	//check if a session exists
+	var session = store.get(name, function(data) {
+		console.log(data);
+	});
+	var sess = req.session;
+	store.set(name,sess);
+	res.render('index', {
+		title: "Ultimate Tic Tac Toe",
+		sid: req.params['room']
+	})
+});
 
 var g = new game();
 
@@ -64,6 +81,7 @@ console.log(g.getState());
 
 var server = http.createServer(app);
 var io = socketio.listen(server);
+io.set('log level', 2);
 
 server.listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));

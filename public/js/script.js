@@ -1,6 +1,9 @@
+//First create Deferreds container that 
+//we ll be using as mutexes
+var Deferreds = {};
+
 //create socket first 
 var socket = io.connect('http://localhost');
-
 
 //Some Common functions
 function Default(o,d,t) {
