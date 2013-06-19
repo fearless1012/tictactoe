@@ -1,3 +1,7 @@
+//create socket first 
+var socket = io.connect('http://localhost');
+
+
 //Some Common functions
 function Default(o,d,t) {
 	'use strict';
@@ -18,10 +22,16 @@ function Algo(what) {
 		return false;
 	};
 	var molecule = methods.molecule = function() {
-		return { x: this.x/3, y: this.y/3 }
+		return { x: Math.floor(this.x/3), y: Math.floor(this.y/3) }
 	};
-	var send = methods.send = function() {
+	var send = methods.send = function(d) {
 		var m = molecule.apply(this, arguments);
+		$.socket.emit('play', {
+			user: 'x',
+			x: this.x,
+			y: this.y
+		});
+		if(d) d.resolve(m.x,m.y);
 	}
 
 	var validate = function() {
@@ -42,7 +52,7 @@ function Algo(what) {
 			this.y = pos[1];
 			ret = methods[what].apply(this, arguments);
 		}
-		//delete all newly created stuff
+		//delete all newly created stuff, since references are passed
 		delete this.x;
 		delete this.y;
 		return ret;
@@ -58,9 +68,14 @@ var CellView = Backbone.View.extend({
 	isAllowed: Algo('isAllowed'),
 	events: {
 		'click' : function(e) {
-			var x = this.model.get('x');
-			var y = this.model.get('y');
-			console.log(x + " " + y);
+			e.preventDefault();
+			var d = $.Deferred();
+			Algo('send').apply(this,[d]);
+			$.when(d).then(function(x,y) {
+				console.log(arguments);
+			}, function() {}, function(x) {
+				console.log(x + "% done");
+			})
 		},
 		'mouseover': function(e) {
 			if(this.isAllowed(1,1))
@@ -83,13 +98,12 @@ var RowView = Backbone.View.extend({
 	className: "Trow",
 	render: function() {
 		for(var i=0;i<9;i++) {
-			var cell = new CellView({
-				model: new Cell({
+			var cell = new Cell({
 					x: this.model.get('x'),
 					y: i
-				})
 			});
-			$(this.el).append(cell.render());
+			$.Cells.push(cell);
+			$(this.el).append(new CellView({ model: cell }).render());
 		}
 		return this.el;
 	}
@@ -116,6 +130,10 @@ var PlayerView = Backbone.View.extend({});
 
 (function() {
 	'use strict';
+	$.socket = io.connect('http://localhost');
+	$.socket.on('receive', function(data) {
+		console.log(data);
+	});
 	$(function() {
 		new BoardView({
 			model: new Board()

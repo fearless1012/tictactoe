@@ -3,7 +3,8 @@ var express = require('express'),
 	user = require('./routes/user'),
 	http = require('http'),
 	path = require('path'),
-	socketio = require('socket.io');
+	socketio = require('socket.io'),
+	game = require('./game.js');
 
 var app = express();
 
@@ -28,9 +29,18 @@ if ('development' == app.get('env')) {
 app.get('/', routes.index);
 app.get('/users', user.list);
 
-var server = http.createServer(app);
-var io = socketio.listen(server);
+var g = new game();
+console.log(g.setQuark(0,0,1));
+console.log(g.setQuark(1,0,1));
+console.log(g.setQuark(1,4,1));
+console.log(g.setQuark(0,0,0));
+console.log(g.setQuark(1,8,1));
+console.log(g.getState());
 
-server.listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-});
+// var server = http.createServer(app);
+// var io = socketio.listen(server);
+// 
+// server.listen(app.get('port'), function(){
+//   console.log('Express server listening on port ' + app.get('port'));
+// });
+
