@@ -1,20 +1,17 @@
-//First create Deferreds container that 
-//we ll be using as mutexes
-var Mutexes = {};
-Mutexes['play'] = $.Deferred();
-Mutexes['board'] = [];
-
 //create socket first 
 var socket = io.connect('http://localhost');
 
 socket.on('update', function(data){
 	console.log(data.status);
+	var d = data.result.board;
 	if(data.status) {
-		if(Mutexes['play'].state() === 'pending')
-			Mutexes['play'].resolve(data.result);
+		$.each($.Quarks.models, function(i,it) {
+			var x = it.get('x');
+			var y = it.get('y');
+			it.set('p', d[x][y]);
+		});
 	} else {
-		if(Mutexes['play'].state() === 'pending')
-			Mutexes['play'].reject(data.result);
+
 	}
 });
 
@@ -40,12 +37,13 @@ function Algo(what) {
 	var molecule = methods.molecule = function() {
 		return { x: Math.floor(this.x/3), y: Math.floor(this.y/3) }
 	};
-	var send = methods.send = function(d) {
-		var m = molecule.apply(this, arguments);
-		Mutexes['play'] = $.Deferred();
+	var send = methods.send = function() {
+		var x = this.model.get('x');
+		var y = this.model.get('y');
+		console.log(x,y);
 		socket.emit('play', {
-			i: m.x,
-			j: m.y
+			i: x,
+			j: y
 		});
 	}
 
@@ -74,24 +72,26 @@ function Algo(what) {
 	};
 }
 
-$.CellCollection = [];
-
 //Models and Views
-var Cell = Backbone.Model.extend({});
-var CellView = Backbone.View.extend({
+var Quark = Backbone.Model.extend({});
+var QuarkCollection = Backbone.Collection.extend({
+	model: Quark
+});
+var QuarkView = Backbone.View.extend({
 	tagName: "div",
-	className: "Tcell",
-	template: _.template($("#tmpl_cell").html()),
+	className: "Tquark",
+	template: _.template($("#tmpl_quark").html()),
 	isAllowed: Algo('isAllowed'),
 	initialize: function() {
+		this.model.on('change', this.update, this);
 		var x = this.model.get('x');
 		var y = this.model.get('y');
 		var that = this;
-		$.when(Mutexes['board'][x][y]).then(function(v){
-			that.$el.html("X");
-		}, function(data) {
-			console.log(data);
-		});
+	},
+	update: function() {
+		var p = this.model.get('p');
+		if(p===0) this.$el.html("O");
+		else if(p===1) this.$el.html("X");
 	},
 	events: {
 		'click' : function(e) {
@@ -99,33 +99,34 @@ var CellView = Backbone.View.extend({
 			Algo('send').apply(this,[]);
 		},
 		'mouseover': function(e) {
-			if(this.isAllowed(1,1) || true)
-				$(this.el).css("background","#dfd");
-			else
-				$(this.el).css("background","#edd")
+			// if(this.isAllowed(1,1) || true)
+			// 	$(this.el).css("background","#dfd");
+			// else
+			// 	$(this.el).css("background","#edd")
 		},
 		'mouseout': function(e) {
-			$(this.el).css("background","#eee");
+			// $(this.el).css("background","#eee");
 		}
 	},
 	render: function() {
-		this.$el.html(this.template());
-		$.CellCollection.push(this.$el);
+		this.$el.html(this.template()).css("background", "#"+this.model.get('x')+"3"+this.model.get('y'));
 		return this.$el;
 	}
 });
 
-var Row = Backbone.Model.extend({});
-var RowView = Backbone.View.extend({
+var Hadron = Backbone.Model.extend({});
+var HadronView = Backbone.View.extend({
 	tagName: "div",
-	className: "Trow",
+	className: "Thadron",
 	render: function() {
 		for(var i=0;i<9;i++) {
-			var cell = new Cell({
+			var quark = new Quark({
 					x: this.model.get('x'),
-					y: i
+					y: i,
+					p: -1
 			});
-			this.$el.append(new CellView({ model: cell }).render());
+			$.Quarks.add([quark]);
+			this.$el.append(new QuarkView({ model: quark }).render());
 		}
 		return this.$el;
 	}
@@ -139,10 +140,10 @@ var BoardView = Backbone.View.extend({
 	},
 	render: function() {
 		for(var i=0;i<9;i++) {
-			var row = new RowView({
-				model: new Row({ x: i })
+			var hadron = new HadronView({
+				model: new Hadron({ x: i })
 			});
-			this.$el.append(row.render());
+			this.$el.append(hadron.render());
 		}
 	}
 });
@@ -152,22 +153,10 @@ var PlayerView = Backbone.View.extend({});
 
 (function() {
 	'use strict';
-	for(var i=0;i<9;i++) {
-		Mutexes['board'][i] = [];
-		for(var j=0;j<9;j++) {
-			Mutexes['board'][i].push($.Deferred());
-		}
-	}
 	$(function() {
+		$.Quarks = new QuarkCollection();
 		new BoardView({
 			model: new Board()
-		});
-		$.when(Mutexes['play']).then(function(data) {
-			console.log(data);
-		}, function(data) {
-			console.log(data);
-		}, function(data) {
-			console.log(x + "% done");
 		});
 	});
 }).apply(this,[]);
