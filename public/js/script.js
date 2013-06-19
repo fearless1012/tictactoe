@@ -1,9 +1,21 @@
 //First create Deferreds container that 
 //we ll be using as mutexes
-var Deferreds = {};
+var Mutexes = {};
+Mutexes['play'] = $.Deferred();
 
 //create socket first 
 var socket = io.connect('http://localhost');
+
+socket.on('update', function(data){
+	console.log(data);
+	if(data.status) {
+		if(Mutexes['play'].state() === 'pending')
+			Mutexes['play'].resolve(data.result);
+	} else {
+		if(Mutexes['play'].state() === 'pending')
+			Mutexes['play'].reject(data.result);
+	}
+});
 
 //Some Common functions
 function Default(o,d,t) {
@@ -29,12 +41,11 @@ function Algo(what) {
 	};
 	var send = methods.send = function(d) {
 		var m = molecule.apply(this, arguments);
-		$.socket.emit('play', {
-			user: 'x',
-			x: this.x,
-			y: this.y
+		Mutexes['play'] = $.Deferred();
+		socket.emit('play', {
+			i: m.x,
+			j: m.y
 		});
-		if(d) d.resolve(m.x,m.y);
 	}
 
 	var validate = function() {
@@ -69,19 +80,22 @@ var CellView = Backbone.View.extend({
 	className: "Tcell",
 	template: _.template($("#tmpl_cell").html()),
 	isAllowed: Algo('isAllowed'),
+	initialize: function() {
+		$.when(Mutexes['play']).then(function(data) {
+			console.log(data);
+		}, function(data) {
+			console.log(data);
+		}, function(data) {
+			console.log(x + "% done");
+		});
+	},
 	events: {
 		'click' : function(e) {
 			e.preventDefault();
-			var d = $.Deferred();
-			Algo('send').apply(this,[d]);
-			$.when(d).then(function(x,y) {
-				console.log(arguments);
-			}, function() {}, function(x) {
-				console.log(x + "% done");
-			})
+			Algo('send').apply(this,[]);
 		},
 		'mouseover': function(e) {
-			if(this.isAllowed(1,1))
+			if(this.isAllowed(1,1) || true)
 				$(this.el).css("background","#dfd");
 			else
 				$(this.el).css("background","#edd")

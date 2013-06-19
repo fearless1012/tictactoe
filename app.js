@@ -1,13 +1,16 @@
-var express = require('express'),
+var connect = require('connect'),
+	express = require('express'),
+	cookie = require('cookie'),
 	routes = require('./routes'),
 	user = require('./routes/user'),
 	http = require('http'),
 	path = require('path'),
 	socketio = require('socket.io'),
 	store = new express.session.MemoryStore();
-	game = require('./game.js');
+	game = require('./game.js'),
+	Room = require('./room.js');
 
-
+var SECRET = 'tic!tac!toe';
 
 var app = express();
 
@@ -19,36 +22,95 @@ app.use(express.favicon());
 //app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
-app.use(express.cookieParser('blah blah blah'));
+app.use(express.cookieParser(SECRET));
 app.use(express.session({ 
-	secret: 'Blah!Blah!Blah!123$5',
-	store: store
+	secret: SECRET,
+	store: store,
+	key: 'tictactoe.sid'
 }));
-app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
-
 app.get('/', routes.index);
 app.get('/users', user.list);
 
 app.get('/:room', function(req, res) {
 	if(!req.params['room']) return false;
 	var name=req.params['room'];
-	//check if a session exists
-	var session = store.get(name, function(data) {
-		console.log(data);
-	});
-	var sess = req.session;
-	store.set(name,sess);
+	req.session.room = name;
 	res.render('index', {
 		title: "Ultimate Tic Tac Toe",
-		sid: req.params['room']
+		sid: name
 	})
 });
+
+var server = http.createServer(app),
+	io = socketio.listen(server),
+	parseCookie = connect.utils.parseSignedCookie;
+
+io.set('log level', 2);
+
+io.set('authorization', function (handshake, accept) {
+	if (handshake.headers.cookie) {
+		var cookieData = cookie.parse(handshake.headers.cookie);
+		handshake.sessionID = parseCookie(cookieData['tictactoe.sid'], SECRET);
+		store.get(handshake.sessionID, function(err, session) {
+			if(err) return accept('Error in Session store', false);
+			else if(!session) {
+				return accept('Session NOT found', false);
+			}
+			handshake.session = session;
+			//create Room if not exists
+			var room = Room.getRoom(handshake.session.room);
+			if(room === false) {
+				Room.addRoom(handshake.session.room);
+				room = Room.getRoom(handshake.session.room);
+			}
+			if(room.isFull()) return accept('Room is FULL', false);
+			if(room.isComplete()) return accept('Game ended, Ask admin to delete', false);
+			handshake.room = room;
+			return accept(null,true);
+		})
+	} else {
+		return accept('No cookie transmitted.', false);
+	}
+});
+
+io.sockets.on('connection', function(socket) {
+	var r = socket.handshake.session.room;
+	var uid = socket.handshake.sessionID;
+	var room = socket.handshake.room;
+	room.addUser(uid);
+	socket.join(r);
+	if(room.game === null) room.game = new game();
+	socket.on('disconnect', function() {
+		room.deleteUser(uid);
+	});
+	socket.on('play', function(data) {
+		if(room.game !== null) {
+			var p = room.getPlayerCode(uid);
+			if(p===-1) console.log("Shouldn't happen");
+			var res = room.game.setQuark(data.i,data.j,p), flag = false;
+			if(res)	flag = true;
+			else flag = false;
+			socket.get(r,function(err,dest){
+				io.sockets.in(dest).emit('update',{
+					status: flag,
+					result: room.game.getState()
+				});
+			});
+		}
+	});
+});
+
+app.use(app.router);
+server.listen(app.get('port'), function(){
+	console.log('Express server listening on port ' + app.get('port'));
+});
+
 
 var g = new game();
 
@@ -57,13 +119,12 @@ console.log(g.setQuark(0,1,0));
 console.log(g.setQuark(1,0,1));
 console.log(g.setQuark(0,2,0));
 console.log(g.setQuark(2,0,1));
-
-console.log(g.setQuark(0,2,0));//cannot access already existing block
+//cannot access already existing block
+console.log(g.setQuark(0,2,0));
 //so player stays the same
 console.log(g.setQuark(0,3,0));
 console.log(g.setQuark(0,3,1));
 console.log(g.setQuark(3,3,1));
-
 console.log(g.setQuark(3,0,0));
 console.log(g.setQuark(0,4,1));
 console.log(g.setQuark(4,0,0));
@@ -76,14 +137,4 @@ console.log(g.setQuark(7,0,0));
 console.log(g.setQuark(0,8,1));
 console.log(g.setQuark(8,0,0));
 console.log(g.setQuark(1,1,1));
-
 console.log(g.getState());
-
-var server = http.createServer(app);
-var io = socketio.listen(server);
-io.set('log level', 2);
-
-server.listen(app.get('port'), function(){
-	console.log('Express server listening on port ' + app.get('port'));
-});
-
