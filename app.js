@@ -1,4 +1,4 @@
-var connect = require('connect'),
+var connect = require('express/node_modules/connect'),
 	express = require('express'),
 	cookie = require('cookie'),
 	routes = require('./routes'),
