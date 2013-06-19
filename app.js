@@ -30,11 +30,26 @@ app.get('/', routes.index);
 app.get('/users', user.list);
 
 var g = new game();
+
 console.log(g.setQuark(0,0,1));
+console.log(g.setQuark(0,1,1));
 console.log(g.setQuark(1,0,1));
-console.log(g.setQuark(1,4,1));
-console.log(g.setQuark(0,0,0));
-console.log(g.setQuark(1,8,1));
+console.log(g.setQuark(0,2,1));
+console.log(g.setQuark(2,0,1));
+console.log(g.setQuark(0,3,1));
+console.log(g.setQuark(3,0,1));
+console.log(g.setQuark(0,4,1));
+console.log(g.setQuark(4,0,1));
+console.log(g.setQuark(0,5,1));
+console.log(g.setQuark(5,0,1));
+console.log(g.setQuark(0,6,1));
+console.log(g.setQuark(6,0,1));
+console.log(g.setQuark(0,7,1));
+console.log(g.setQuark(7,0,1));
+console.log(g.setQuark(0,8,1));
+console.log(g.setQuark(8,0,1));
+console.log(g.setQuark(1,1,1));
+
 console.log(g.getState());
 
 // var server = http.createServer(app);
