@@ -11,6 +11,16 @@ var WC = [
 	[0,4,8],
 	[2,4,6]];
 
+var validateXY = function(x,y) {
+	if('number' !== typeof x) return false;
+	if('number' !== typeof y) return false;
+	if(x>=0 && x<9 && y>=0 && y<9) return true;
+	return false;
+}
+var Default = function(o,d) {
+	return 'undefined' === typeof o ? d : o;
+}
+
 var Particle = function(type) {
 	if(type !== 'quark') this.data = [];
 	this.winner = -1;
@@ -36,7 +46,7 @@ Particle.prototype.isFull = function() {
 Particle.prototype.check = function(p) {
 	if( 'number' === typeof this.winner &&
 		this.winner !== -1 ) return this.winner;
-	if(this.isQuark()) return this.winner;
+	if(this.isQuark()) return this.winner===-1?false:this.winner;
 	for(var i=0;i<WC.length;i++) {
 		if(this.isEqual(p,
 			this.data[WC[i][0]].winner,
@@ -62,20 +72,22 @@ var game = function() {
 		return new arguments.callee(arguments);
 	}
 };
-
-var validateXY = function(x,y) {
-	if('number' !== typeof x) return false;
-	if('number' !== typeof y) return false;
-	if(x>=0 && x<9 && y>=0 && y<9) return true;
-	return false;
-}
-
-var Default = function(o,d) {
-	return 'undefined' === typeof o ? d : o;
-}
-
 game.prototype.prev = -1;
 
+// X always starts the game
+// So previous player is O
+game.prototype.pp = 0;
+
+game.prototype.changePlayer = function() {
+	if(this.pp === 0) this.pp = 1;
+	else if(this.pp === 1) this.pp = 0;
+	else console.log("This shouldn't Happen. Third player entered room.");
+}
+game.prototype.player = function() {
+	if(this.pp === 0) return 1;
+	else if(this.pp === 1) return 0;
+	else console.log("This shouldn't happen. Third player entered room.");
+}
 game.prototype.setQuark = function(i,j,p,callback) {
 	i = Default(i,-1),
 	j = Default(j,-1),
@@ -83,18 +95,15 @@ game.prototype.setQuark = function(i,j,p,callback) {
 	prev = Default(this.prev, -1);
 	if(!validateXY(i,j)) return false;
 
-	var next = this.board.data[prev];
-
 	var hadron = this.board.data[i],
 		quark = hadron.data[j];
-		
 
+	//if the current player is not playing
+	if(this.player() !== p) return false;
 	if(prev === -1) {
 		//the opponent is allowed to choose anything
 		if(hadron.winner !== -1) return false;
 		if(quark.winner !== -1) return false;
-		quark.winner = p;
-		this.prev = j;
 	} else if(prev === i) {
 		//the opponent has chosen the right hadron
 		//if opponent fell into a conquered hadron
@@ -103,49 +112,26 @@ game.prototype.setQuark = function(i,j,p,callback) {
 			if(hadron.isFull()) return false;
 			//so now it's not full
 			if(quark.winner !== -1) return false;
-			quark.winner = p;
-			this.prev = j;
 		} else {
 			if(quark.winner !== -1) return false;
-			quark.winner = p;
-			this.prev = j;
 		}
 	} else {
-		//user has performed an illegal move
-		return false;
+		if(this.board.data[prev].isFull()) {
+			if(hadron.winner != -1){
+				if(hadron.isFull()) return false;
+				if(quark.winner !== -1) return false;
+			} else {
+				if(quark.winner !== -1) return false;
+			}
+		} else {
+			//user has performed an illegal move
+			return false;
+		}
 	}
-
-	// //if opponent sends me to a hadron that's already won
-	// if(next.winner !== -1) {
-	// 	//check if opponent chose an empty block in that hadron
-	// 	if(i === prev) {
-	// 		var quark = next.data[j];
-	// 		if(quark.winner !== -1) {
-
-	// 		}
-	// 	}
-	// }
-
-
-	// if(hadron.winner !== -1) {
-	// 	//he can choose to play anywhere in that hadron
-	// 	//if he chooses a quark that's filled 
-	// 	if(quark.winner !== -1) {
-	// 		//
-	// 		this.prev = -1;
-	// 		return true;
-	// 	}
-	// 	return false;
-	// }
-	// //check if it's already ticked
-	// if(quark.winner !== -1) return false;
-	// //check prev move
-	// if(prev !== -1)	if(i !== prev) return false;
-	// //conquer the quark //ensure p is obtained from session data
-	// quark.winner = p;
-	// this.prev=j;
-	//check if he won the hadron
-
+	//legal move
+	quark.winner = p;
+	this.prev = j;
+	this.changePlayer();
 
 	var w = hadron.check(p);
 	if(w !== false) {
@@ -219,9 +205,5 @@ game.prototype.getState2 = function() {
 	}
 	return state3;
 };
-
-game.prototype.set = function(x,y) {
-	if(!validateXY(x,y)) return false;
-}
 
 module.exports = game;
