@@ -102,7 +102,7 @@ var RowView = Backbone.View.extend({
 					x: this.model.get('x'),
 					y: i
 			});
-			$.Cells.push(cell);
+			//$.Cells.push(cell);
 			$(this.el).append(new CellView({ model: cell }).render());
 		}
 		return this.el;

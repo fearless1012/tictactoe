@@ -4,5 +4,6 @@
  */
 
 exports.index = function(req, res){
-  res.render('index', { title: 'Ultimate Tic Tac Toe' });
+	console.log(req.session);
+	res.render('index', { title: 'Ultimate Tic Tac Toe' });
 };

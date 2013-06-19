@@ -4,6 +4,7 @@ var express = require('express'),
 	http = require('http'),
 	path = require('path'),
 	socketio = require('socket.io'),
+	store = new express.session.MemoryStore();
 	game = require('./game.js');
 
 var app = express();
@@ -17,7 +18,10 @@ app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser('blah blah blah'));
-app.use(express.session());
+app.use(express.session({ 
+	secret: 'Blah!Blah!Blah!123$5',
+	store: store
+}));
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -41,6 +45,8 @@ console.log(g.setQuark(0,2,0));//cannot access already existing block
 //so player stays the same
 console.log(g.setQuark(0,3,0));
 console.log(g.setQuark(0,3,1));
+console.log(g.setQuark(3,3,1));
+
 console.log(g.setQuark(3,0,0));
 console.log(g.setQuark(0,4,1));
 console.log(g.setQuark(4,0,0));
@@ -56,10 +62,10 @@ console.log(g.setQuark(1,1,1));
 
 console.log(g.getState());
 
-// var server = http.createServer(app);
-// var io = socketio.listen(server);
-// 
-// server.listen(app.get('port'), function(){
-//   console.log('Express server listening on port ' + app.get('port'));
-// });
+var server = http.createServer(app);
+var io = socketio.listen(server);
+
+server.listen(app.get('port'), function(){
+	console.log('Express server listening on port ' + app.get('port'));
+});
 
