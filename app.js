@@ -110,31 +110,3 @@ app.use(app.router);
 server.listen(app.get('port'), function(){
 	console.log('Express server listening on port ' + app.get('port'));
 });
-
-
-var g = new game();
-
-console.log(g.setQuark(0,0,1));
-console.log(g.setQuark(0,1,0));
-console.log(g.setQuark(1,0,1));
-console.log(g.setQuark(0,2,0));
-console.log(g.setQuark(2,0,1));
-//cannot access already existing block
-console.log(g.setQuark(0,2,0));
-//so player stays the same
-console.log(g.setQuark(0,3,0));
-console.log(g.setQuark(0,3,1));
-console.log(g.setQuark(3,3,1));
-console.log(g.setQuark(3,0,0));
-console.log(g.setQuark(0,4,1));
-console.log(g.setQuark(4,0,0));
-console.log(g.setQuark(0,5,1));
-console.log(g.setQuark(5,0,0));
-console.log(g.setQuark(0,6,1));
-console.log(g.setQuark(6,0,0));
-console.log(g.setQuark(0,7,1));
-console.log(g.setQuark(7,0,0));
-console.log(g.setQuark(0,8,1));
-console.log(g.setQuark(8,0,0));
-console.log(g.setQuark(1,1,1));
-console.log(g.getState());

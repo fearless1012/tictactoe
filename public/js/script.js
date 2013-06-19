@@ -2,12 +2,13 @@
 //we ll be using as mutexes
 var Mutexes = {};
 Mutexes['play'] = $.Deferred();
+Mutexes['board'] = [];
 
 //create socket first 
 var socket = io.connect('http://localhost');
 
 socket.on('update', function(data){
-	console.log(data);
+	console.log(data.status);
 	if(data.status) {
 		if(Mutexes['play'].state() === 'pending')
 			Mutexes['play'].resolve(data.result);
@@ -73,6 +74,8 @@ function Algo(what) {
 	};
 }
 
+$.CellCollection = [];
+
 //Models and Views
 var Cell = Backbone.Model.extend({});
 var CellView = Backbone.View.extend({
@@ -81,12 +84,13 @@ var CellView = Backbone.View.extend({
 	template: _.template($("#tmpl_cell").html()),
 	isAllowed: Algo('isAllowed'),
 	initialize: function() {
-		$.when(Mutexes['play']).then(function(data) {
-			console.log(data);
+		var x = this.model.get('x');
+		var y = this.model.get('y');
+		var that = this;
+		$.when(Mutexes['board'][x][y]).then(function(v){
+			that.$el.html("X");
 		}, function(data) {
 			console.log(data);
-		}, function(data) {
-			console.log(x + "% done");
 		});
 	},
 	events: {
@@ -105,7 +109,9 @@ var CellView = Backbone.View.extend({
 		}
 	},
 	render: function() {
-		return this.$el.html(this.template());
+		this.$el.html(this.template());
+		$.CellCollection.push(this.$el);
+		return this.$el;
 	}
 });
 
@@ -119,10 +125,9 @@ var RowView = Backbone.View.extend({
 					x: this.model.get('x'),
 					y: i
 			});
-			//$.Cells.push(cell);
-			$(this.el).append(new CellView({ model: cell }).render());
+			this.$el.append(new CellView({ model: cell }).render());
 		}
-		return this.el;
+		return this.$el;
 	}
 });
 
@@ -147,13 +152,22 @@ var PlayerView = Backbone.View.extend({});
 
 (function() {
 	'use strict';
-	$.socket = io.connect('http://localhost');
-	$.socket.on('receive', function(data) {
-		console.log(data);
-	});
+	for(var i=0;i<9;i++) {
+		Mutexes['board'][i] = [];
+		for(var j=0;j<9;j++) {
+			Mutexes['board'][i].push($.Deferred());
+		}
+	}
 	$(function() {
 		new BoardView({
 			model: new Board()
+		});
+		$.when(Mutexes['play']).then(function(data) {
+			console.log(data);
+		}, function(data) {
+			console.log(data);
+		}, function(data) {
+			console.log(x + "% done");
 		});
 	});
 }).apply(this,[]);
