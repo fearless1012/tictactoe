@@ -89,6 +89,12 @@ io.sockets.on('connection', function(socket) {
 	socket.on('disconnect', function() {
 		room.deleteUser(uid);
 	});
+	socket.emit('user', {
+		player: room.getPlayerCode(uid),
+		expect: room.game.player(),
+		nextHadron: room.game.prev,
+		state: room.game.getState()
+	});
 	socket.on('play', function(data) {
 		if(room.game !== null) {
 			var p = room.getPlayerCode(uid);
@@ -99,11 +105,9 @@ io.sockets.on('connection', function(socket) {
 			socket.get(r,function(err,dest){
 				io.sockets.in(dest).emit('update', {
 					status: flag,
-					x: room.playX,
-					o: room.playO,
 					expect: room.game.player(),
 					nextHadron: room.game.prev,
-					result: room.game.getState()
+					state: room.game.getState()
 				});
 			});
 		}

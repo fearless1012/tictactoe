@@ -10,15 +10,18 @@ body {
 	width: 360px;
 	height: 360px;
 	margin: 20px auto;
-	border: solid 5px #AAA;
-	border-radius: 3px;
+	border: solid 1px #ddd;
 }
-h1 {
-	font-size: 50px;
+.info {
+	width: 400px;
+	margin: auto;
+	background: #397abd;
+	color: white;
+}
+.info h3 {
+	color: white;
 }
 #statusbar {
-	background: #eee;
-	font-family: Verdana;
 	text-align: center;
 	width: 360px;
 	margin: auto;
@@ -27,10 +30,9 @@ h1 {
 	display: block;
 	width: 30px;
 	height: 30px;
-	border: solid 1px white;
+	border: solid 1px transparent;
 	padding: 4px;
 	float: left;
-	background: #eee;
 }
 .Tquark:hover { cursor: pointer; }
 
@@ -38,11 +40,6 @@ h1 {
 	width: 120px;
 	float: left;
 }
-
-/*.Trow div:nth-child(3), .Trow div:nth-child(6) { border-right:solid 1px black; }
-.Trow div:nth-child(4), .Trow div:nth-child(7) { border-left:solid 1px black; }
-/*.container div.Trow:nth-child(3), .container div.Trow:nth-child(6) { border-bottom: solid 1px black; }
-.container div.Trow:nth-child(4), .container div.Trow:nth-child(7) { border-top: solid 1px black; } */
 
 .Trow {
 	clear:both;

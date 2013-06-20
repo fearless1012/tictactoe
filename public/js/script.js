@@ -1,20 +1,43 @@
 //create socket first
 var socket = io.connect('http://' + location.hostname);
 
+socket.on('user', function(data) {
+	var p = $.Player = data.player;
+	var players = ['O', 'X'];
+	$("#player").html(players[p]);
+	UpdateGame(data);
+});
+
 socket.on('update', function(data){
-	var d = data.result.hadron;
+	var d = data.state.hadron;
 	if(data.status) {
-		$.each($.Quarks.models, function(i,it) {
-			var x = it.get('x');
-			var y = it.get('y');
-			it.set('p', d[x][y]);
-			it.set('allowed', y);
-		});
+		$.Status(true);
+		UpdateGame(data)
 	} else {
-		$.Status("Illegal Move");
+		$.Status(false);
 	}
 });
 
+function UpdateGame(data) {
+	if(data.expect === $.Player) {
+		$("#who").html("Your Turn");
+	} else {
+		$("#who").html("Opponent's Turn");
+	}
+	var b = data.state.board;
+	$.each($.Hadrons.models, function(i,it) {
+		var x = it.get('x');
+		it.set('p',b[x]);
+		if(data.nextHadron === x) it.set('here',true);
+		else it.set('here',false);
+	});
+	var d = data.state.hadron;
+	$.each($.Quarks.models, function(i,it) {
+		var x = it.get('x');
+		var y = it.get('y');
+		it.set('p', d[x][y]);
+	});
+}
 //Some Common functions
 function Default(o,d,t) {
 	'use strict';
@@ -59,16 +82,16 @@ var QuarkView = Backbone.View.extend({
 		});
 	},
 	events: {
-		'click' : function(e) {
+		'mouseup' : function(e) {
 			e.preventDefault();
 			this.send();
 		},
 		'mouseover': function(e) {
 			this.prevColor = $(this.el).css("background");
 			if(this.isAllowed(1,1))
-				$(this.el).css("background","#595");
+				$(this.el).css("background","#3c7ebd");
 			else
-			 	$(this.el).css("background","#955");
+			 	$(this.el).css("background","#7e3cbd");
 		},
 		'mouseout': function(e) {
 			$(this.el).css("background",this.prevColor);
@@ -76,27 +99,38 @@ var QuarkView = Backbone.View.extend({
 	},
 	render: function() {
 		var x = this.model.get('x');
-		this.$el.html(this.template()).css({
-			background: x%2 === 0 ? "#ddd" : "#eee"
-		});
+		this.$el.html(this.template());
 		return this.$el;
 	}
 });
 
 var Hadron = Backbone.Model.extend({});
+var HadronCollection = Backbone.Collection.extend({});
 var HadronView = Backbone.View.extend({
 	tagName: "div",
 	className: "Thadron",
+	initialize: function() {
+		this.model.on('change',this.update,this);
+	},
+	update: function() {
+		if(this.model.get('here') === true) this.$el.css("background", "#dfd");
+		else this.$el.css("background",this.prevColor);
+	},
 	render: function() {
+		var x = this.model.get('x');
 		for(var i=0;i<9;i++) {
 			var quark = new Quark({
-					x: this.model.get('x'),
+					x: x,
 					y: i,
 					p: -1
 			});
 			$.Quarks.add([quark]);
 			this.$el.append(new QuarkView({ model: quark }).render());
 		}
+		this.prevColor = x%2 === 0 ? "#fff" : "#eee";
+		this.$el.css({
+			background: this.prevColor
+		});
 		return this.$el;
 	}
 });
@@ -109,10 +143,11 @@ var BoardView = Backbone.View.extend({
 	},
 	render: function() {
 		for(var i=0;i<9;i++) {
-			var hadron = new HadronView({
-				model: new Hadron({ x: i })
-			});
-			this.$el.append(hadron.render());
+			var hadron = new Hadron({x : i});
+			$.Hadrons.add([hadron]);
+			this.$el.append(new HadronView({
+				model: hadron
+			}).render());
 		}
 	}
 });
@@ -124,15 +159,21 @@ var PlayerView = Backbone.View.extend({});
 	'use strict';
 	$(function() {
 		$.Quarks = new QuarkCollection();
-		var statusbar = $("#statusbar");
-		$.Status = function(message, severity) {
-			statusbar.html(message).stop().delay(4000).animate({
-				opacity: 0.1
-			},1000, function() {
-				$(this).html("Status bar").stop().animate({
-					opacity: 1
-				},250);
-			});
+		$.Hadrons = new HadronCollection();
+		var bar = $("#GAME");
+		$.Status = function(state) {
+			var flag = false;
+			if(state) {
+				bar.css("border-color", "green");
+				setTimeout(function() {
+					bar.css("border-color", "#ddd");
+				},100);
+			} else {
+				bar.css("border-color", "red");
+				setTimeout(function() {
+					bar.css("border-color", "#ddd");
+				},100);
+			}
 		}
 		new BoardView({
 			model: new Board()
