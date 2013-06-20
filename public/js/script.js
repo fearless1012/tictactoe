@@ -19,7 +19,7 @@ jQuery.fn.enableTextSelect = function() {
 };
 
 //create socket first
-var socket = io.connect('http://' + location.hostname);
+var socket = io.connect('http://' + location.href);
 
 socket.on('user', function(data) {
 	var p = $.Player = data.player;
