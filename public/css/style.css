@@ -7,8 +7,8 @@ body {
 	clear:both;
 }
 .container {
-	width: 360px;
-	height: 360px;
+	width: 366px;
+	height: 366px;
 	margin: 20px auto;
 	border: solid 1px #ddd;
 }
@@ -38,6 +38,7 @@ body {
 
 .Thadron {
 	width: 120px;
+	border: solid 1px transparent;
 	float: left;
 }
 

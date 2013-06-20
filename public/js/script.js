@@ -115,6 +115,8 @@ var HadronView = Backbone.View.extend({
 	update: function() {
 		if(this.model.get('here') === true) this.$el.css("background", "#dfd");
 		else this.$el.css("background",this.prevColor);
+		if(this.model.get('p') === 1) this.$el.css("border-color", "red");
+		else if(this.model.get('p') === 0) this.$el.css("border-color", "blue");
 	},
 	render: function() {
 		var x = this.model.get('x');
