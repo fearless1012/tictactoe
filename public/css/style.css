@@ -3,7 +3,23 @@
 body {
 	max-width: 1024px;
 }
+.clearer {
+	clear:both;
+}
 .container {
+	width: 360px;
+	height: 360px;
+	margin: 20px auto;
+	border: solid 5px #AAA;
+	border-radius: 3px;
+}
+h1 {
+	font-size: 50px;
+}
+#statusbar {
+	background: #eee;
+	font-family: Verdana;
+	text-align: center;
 	width: 360px;
 	margin: auto;
 }

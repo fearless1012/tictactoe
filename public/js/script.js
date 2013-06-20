@@ -2,16 +2,17 @@
 var socket = io.connect('http://localhost');
 
 socket.on('update', function(data){
-	console.log(data.status);
-	var d = data.result.board;
+	var d = data.result.hadron;
 	if(data.status) {
+		$.Status("asdf");
 		$.each($.Quarks.models, function(i,it) {
 			var x = it.get('x');
 			var y = it.get('y');
 			it.set('p', d[x][y]);
+			it.set('allowed', y);
 		});
 	} else {
-
+		$.Status("Illegal Move");
 	}
 });
 
@@ -21,55 +22,6 @@ function Default(o,d,t) {
 	if("string" === typeof t)
 		return t === typeof o ? o : d;
 	return 'undefined' === typeof o ? d : o;
-}
-function Algo(what) {
-	'use strict';
-	if(!_.isString(what)) return function() {};
-
-	var methods = {};
-	//each method will be called with first two parameters as x and y
-	//other arguments proceed
-	var isAllowed = methods.isAllowed = function(ix,iy) {
-		if( Math.floor(this.x/3) === ix &&
-			Math.floor(this.y/3) === iy ) return true;
-		return false;
-	};
-	var molecule = methods.molecule = function() {
-		return { x: Math.floor(this.x/3), y: Math.floor(this.y/3) }
-	};
-	var send = methods.send = function() {
-		var x = this.model.get('x');
-		var y = this.model.get('y');
-		console.log(x,y);
-		socket.emit('play', {
-			i: x,
-			j: y
-		});
-	}
-
-	var validate = function() {
-		if('undefined' === typeof this.model) return false;
-		if('undefined' === typeof this.model.get) return false;
-		var x = Default(this.model.get('x'), -1, "number"),
-			y = Default(this.model.get('y'), -1, "number");
-		if(x>=0 && x<9 && y>=0 && y<9) return [x,y];
-		return false;
-	};
-
-	return function() {
-		var pos = validate.apply(this,arguments);
-		if(pos === false) return false;
-		var ret = false;
-		if('function' === typeof methods[what]) {
-			this.x = pos[0];
-			this.y = pos[1];
-			ret = methods[what].apply(this, arguments);
-		}
-		//delete all newly created stuff, since references are passed
-		delete this.x;
-		delete this.y;
-		return ret;
-	};
 }
 
 //Models and Views
@@ -81,7 +33,13 @@ var QuarkView = Backbone.View.extend({
 	tagName: "div",
 	className: "Tquark",
 	template: _.template($("#tmpl_quark").html()),
-	isAllowed: Algo('isAllowed'),
+	isAllowed: function(ix,iy) {
+		var hadron = this.model.get('allowed');
+
+		if( Math.floor(this.x/3) === ix &&
+			Math.floor(this.y/3) === iy ) return true;
+		return false;
+	},
 	initialize: function() {
 		this.model.on('change', this.update, this);
 		var x = this.model.get('x');
@@ -93,23 +51,35 @@ var QuarkView = Backbone.View.extend({
 		if(p===0) this.$el.html("O");
 		else if(p===1) this.$el.html("X");
 	},
+	send: function() {
+		var x = this.model.get('x');
+		var y = this.model.get('y');
+		socket.emit('play', {
+			i: x,
+			j: y
+		});
+	},
 	events: {
 		'click' : function(e) {
 			e.preventDefault();
-			Algo('send').apply(this,[]);
+			this.send();
 		},
 		'mouseover': function(e) {
-			// if(this.isAllowed(1,1) || true)
-			// 	$(this.el).css("background","#dfd");
-			// else
-			// 	$(this.el).css("background","#edd")
+			this.prevColor = $(this.el).css("background");
+			if(this.isAllowed(1,1))
+				$(this.el).css("background","#595");
+			else
+			 	$(this.el).css("background","#955")
 		},
 		'mouseout': function(e) {
-			// $(this.el).css("background","#eee");
+			$(this.el).css("background",this.prevColor);
 		}
 	},
 	render: function() {
-		this.$el.html(this.template()).css("background", "#"+this.model.get('x')+"3"+this.model.get('y'));
+		var x = this.model.get('x');
+		this.$el.html(this.template()).css({
+			background: x%2 === 0 ? "#ddd" : "#eee"
+		});
 		return this.$el;
 	}
 });
@@ -155,6 +125,16 @@ var PlayerView = Backbone.View.extend({});
 	'use strict';
 	$(function() {
 		$.Quarks = new QuarkCollection();
+		var statusbar = $("#statusbar");
+		$.Status = function(message, severity) {
+			statusbar.html(message).stop().delay(4000).animate({
+				opacity: 0.1
+			},1000, function() {
+				$(this).html("Status bar").stop().animate({
+					opacity: 1
+				},250);
+			});
+		}
 		new BoardView({
 			model: new Board()
 		});

@@ -99,6 +99,8 @@ io.sockets.on('connection', function(socket) {
 			socket.get(r,function(err,dest){
 				io.sockets.in(dest).emit('update',{
 					status: flag,
+					x: room.playX,
+					o: room,playO,
 					result: room.game.getState()
 				});
 			});
