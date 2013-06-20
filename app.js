@@ -100,7 +100,7 @@ io.sockets.on('connection', function(socket) {
 				io.sockets.in(dest).emit('update',{
 					status: flag,
 					x: room.playX,
-					o: room,playO,
+					o: room.playO,
 					result: room.game.getState()
 				});
 			});
