@@ -1,5 +1,5 @@
-//create socket first 
-var socket = io.connect('http://localhost');
+//create socket first
+var socket = io.connect('http://' + location.hostname);
 
 socket.on('update', function(data){
 	var d = data.result.hadron;

@@ -50,7 +50,7 @@ Particle.prototype.check = function(p) {
 	for(var i=0;i<WC.length;i++) {
 		if(this.isEqual(p,
 			this.data[WC[i][0]].winner,
-			this.data[WC[i][1]].winner, 
+			this.data[WC[i][1]].winner,
 			this.data[WC[i][2]].winner )) {
 			this.winner = this.data[WC[i][0]].winner;
 			return this.winner;
@@ -82,12 +82,12 @@ game.prototype.changePlayer = function() {
 	if(this.pp === 0) this.pp = 1;
 	else if(this.pp === 1) this.pp = 0;
 	else console.log("This shouldn't Happen. Third player entered room.");
-}
+};
 game.prototype.player = function() {
 	if(this.pp === 0) return 1;
 	else if(this.pp === 1) return 0;
 	else console.log("This shouldn't happen. Third player entered room.");
-}
+};
 game.prototype.setQuark = function(i,j,p,callback) {
 	i = Default(i,-1),
 	j = Default(j,-1),
@@ -137,8 +137,7 @@ game.prototype.setQuark = function(i,j,p,callback) {
 	if(w !== false) {
 		//notify that ith hadron is conquered by p
 		if(w === p) {
-			if('function' === typeof callback) 
-				callback.apply({
+			if('function' === typeof callback) callback.apply({
 				type: 'hadron',
 				winner: p,
 				pos: i
@@ -151,10 +150,10 @@ game.prototype.setQuark = function(i,j,p,callback) {
 		if(w === p && 'function' === typeof callback) callback.apply({
 			type: 'board',
 			winner: p
-		})
+		});
 	}
 	return true;
-}
+};
 game.prototype.getState = function() {
 	var state = {};
 	var i,j;
@@ -168,42 +167,6 @@ game.prototype.getState = function() {
 		for(j=0;j<9;j++) state.hadron[i].push(this.board.data[i].data[j].winner);
 	}
 	return state;
-};
-game.prototype.getState2 = function() {
-	var state = [];
-	var i,j;
-	for(i=0;i<9;i++) { 
-		state[i] = [];
-		for(j=0;j<9;j++) state[i].push(-1);
-	}
-	for(i=0;i<9;i++) {
-		for(j=0;j<9;j++) {
-			var y = Math.floor(j/3) + (i%3)*3;
-			var x = Math.floor(i/3)*3 + (j%3);
-			console.log(x,y);
-			state[x][y] = this.board.data[i].data[j].winner;
-		}
-	}
-	return state;
-	var state2 = [];
-	for(var i=0;i<9;i++) {
-		state2[i] = [];
-		var row = [];
-		for(var j=0;j<9;j++) {
-			//row.push(i+","+j);
-			row.push(this.board.data[i].data[j].winner);
-		}
-		state2[i].push(row.slice(0,3));
-		state2[i].push(row.slice(3,6));
-		state2[i].push(row.slice(6,9));
-	}
-	return state2;
-	var state3 = [];
-	for(var i=0;i<3;i++) {
-		state3[i] = [];
-		state3[i].push(state2[Math.floor(i/3)*3]);
-	}
-	return state3;
 };
 
 module.exports = game;
