@@ -158,6 +158,7 @@ game.prototype.getState = function() {
 	var state = {};
 	var i,j;
 	state.board = [];
+	state.winner = this.board.winner;
 	for(i=0;i<9;i++) {
 		state.board.push(this.board.data[i].winner);
 	}

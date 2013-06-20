@@ -1,3 +1,23 @@
+//Blah Blah stuff
+jQuery.fn.disableTextSelect = function() {
+	return this.each(function() {
+		$(this).css({
+			'MozUserSelect':'none',
+			'webkitUserSelect':'none'
+		}).attr('unselectable','on').bind('selectstart', function() {
+			return false;
+		});
+	});
+};
+jQuery.fn.enableTextSelect = function() {
+	return this.each(function() {
+		$(this).css({
+			'MozUserSelect':'',
+			'webkitUserSelect':''
+		}).attr('unselectable','off').unbind('selectstart');
+	});
+};
+
 //create socket first
 var socket = io.connect('http://' + location.hostname);
 
@@ -19,6 +39,21 @@ socket.on('update', function(data){
 });
 
 function UpdateGame(data) {
+	if(data.state.winner !== -1) {
+		//game over
+		var players = ['O', 'X'];
+		if(data.state.winner === $.Player) {
+			$("#GAME").fadeOut(500,function() {
+				$("#iwon").html("<h1>YOU <br/>WIN :)</h1>").fadeIn(250);
+			});
+		} else {
+			var p = $.Player === 0 ? 1:0;
+			$("#GAME").fadeOut(500,function() {
+				$("#uwon").html("<h1>Player "+players[p]+" wins :(</h1>").fadeIn(250);
+			});
+		}
+		return;
+	}
 	if(data.expect === $.Player) {
 		$("#who").html("Your Turn");
 	} else {
@@ -87,14 +122,14 @@ var QuarkView = Backbone.View.extend({
 			this.send();
 		},
 		'mouseover': function(e) {
-			this.prevColor = $(this.el).css("background");
-			if(this.isAllowed(1,1))
-				$(this.el).css("background","#3c7ebd");
-			else
-			 	$(this.el).css("background","#7e3cbd");
+			// this.prevColor = $(this.el).css("background");
+			// if(this.isAllowed(1,1))
+			// 	$(this.el).css("background","#3c7ebd");
+			// else
+			//  	$(this.el).css("background","#7e3cbd");
 		},
 		'mouseout': function(e) {
-			$(this.el).css("background",this.prevColor);
+			// $(this.el).css("background",this.prevColor);
 		}
 	},
 	render: function() {
@@ -160,19 +195,20 @@ var PlayerView = Backbone.View.extend({});
 (function() {
 	'use strict';
 	$(function() {
+		$("#GAME").disableTextSelect();
 		$.Quarks = new QuarkCollection();
 		$.Hadrons = new HadronCollection();
 		var bar = $("#GAME");
 		$.Status = function(state) {
-			var flag = false;
+			var flag = false, timeout=500;
 			if(state) {
-				bar.css("border-color", "green").stop().animate({
-					"border-color": "#ddd"
-				},250);
+				bar.stop().animate({ borderColor: "#5f5" }, timeout/4, function(){
+					$(this).stop().animate({ borderColor: "#ddd" }, timeout);
+				});
 			} else {
-				bar.css("border-color", "red").stop().animate({
-					"border-color": "#ddd"
-				},250);
+				bar.stop().animate({ borderColor: "#f55" }, timeout/4, function(){
+					$(this).stop().animate({ borderColor: "#ddd" }, timeout);
+				});
 			}
 		}
 		new BoardView({

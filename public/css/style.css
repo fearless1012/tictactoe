@@ -6,11 +6,19 @@ body {
 .clearer {
 	clear:both;
 }
-.container {
+.container, .winner {
 	width: 366px;
 	height: 366px;
 	margin: 20px auto;
-	border: solid 1px #ddd;
+	border: solid 2px #ddd;
+}
+#iwon {
+	display: none;
+	background: #5f5;
+}
+#uwon {
+	display: none;
+	background: #f55;
 }
 .info {
 	width: 400px;
@@ -34,8 +42,10 @@ body {
 	padding: 4px;
 	float: left;
 }
-.Tquark:hover { cursor: pointer; }
-
+.Tquark:hover { 
+	cursor: pointer; 
+	background: #3c7ebd;
+}
 .Thadron {
 	width: 120px;
 	border: solid 1px transparent;
