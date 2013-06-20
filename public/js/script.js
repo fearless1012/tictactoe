@@ -4,7 +4,6 @@ var socket = io.connect('http://' + location.hostname);
 socket.on('update', function(data){
 	var d = data.result.hadron;
 	if(data.status) {
-		$.Status("asdf");
 		$.each($.Quarks.models, function(i,it) {
 			var x = it.get('x');
 			var y = it.get('y');
@@ -69,7 +68,7 @@ var QuarkView = Backbone.View.extend({
 			if(this.isAllowed(1,1))
 				$(this.el).css("background","#595");
 			else
-			 	$(this.el).css("background","#955")
+			 	$(this.el).css("background","#955");
 		},
 		'mouseout': function(e) {
 			$(this.el).css("background",this.prevColor);

@@ -97,10 +97,12 @@ io.sockets.on('connection', function(socket) {
 			if(res)	flag = true;
 			else flag = false;
 			socket.get(r,function(err,dest){
-				io.sockets.in(dest).emit('update',{
+				io.sockets.in(dest).emit('update', {
 					status: flag,
 					x: room.playX,
 					o: room.playO,
+					expect: room.game.player(),
+					nextHadron: room.game.prev,
 					result: room.game.getState()
 				});
 			});
