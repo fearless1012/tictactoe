@@ -166,15 +166,13 @@ var PlayerView = Backbone.View.extend({});
 		$.Status = function(state) {
 			var flag = false;
 			if(state) {
-				bar.css("border-color", "green");
-				setTimeout(function() {
-					bar.css("border-color", "#ddd");
-				},100);
+				bar.css("border-color", "green").stop().animate({
+					"border-color": "#ddd"
+				},250);
 			} else {
-				bar.css("border-color", "red");
-				setTimeout(function() {
-					bar.css("border-color", "#ddd");
-				},100);
+				bar.css("border-color", "red").stop().animate({
+					"border-color": "#ddd"
+				},250);
 			}
 		}
 		new BoardView({
