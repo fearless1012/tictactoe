@@ -19,7 +19,7 @@ jQuery.fn.enableTextSelect = function() {
 };
 
 //create socket first
-var socket = io.connect('http://' + location.href);
+var socket = io.connect(location.protocol + location.hostname);
 
 socket.on('user', function(data) {
 	var p = $.Player = data.player;
@@ -54,6 +54,17 @@ function UpdateGame(data) {
 		}
 		return;
 	}
+	//if match is a draw
+	var draw = true;
+	$.each(data.state.board, function(i,it){
+		draw = draw && (it !== -1);
+	});
+	if(draw) {
+		$("#GAME").fadeOut(500,function() {
+			$("#draw").html("<h1>Draw :| </h1>").fadeIn(250);
+		});
+	}
+	//Proceed
 	if(data.expect === $.Player) {
 		$("#who").html("Your Turn");
 	} else {
@@ -91,8 +102,6 @@ var QuarkView = Backbone.View.extend({
 	className: "Tquark",
 	template: _.template($("#tmpl_quark").html()),
 	isAllowed: function(ix,iy) {
-		var hadron = this.model.get('allowed');
-
 		if( Math.floor(this.x/3) === ix &&
 			Math.floor(this.y/3) === iy ) return true;
 		return false;
@@ -213,6 +222,17 @@ var PlayerView = Backbone.View.extend({});
 		}
 		new BoardView({
 			model: new Board()
+		});
+		var helpout = false;
+		$("#title").click(function(e){
+			e.preventDefault();
+			if(helpout) {
+				helpout = false;
+				$("#help").stop().animate({height: 0},250);
+			} else {
+				helpout = true;
+				$("#help").stop().animate({height: 150},250);
+			}
 		});
 	});
 }).apply(this,[]);

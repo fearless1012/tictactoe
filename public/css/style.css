@@ -12,6 +12,24 @@ body {
 	margin: 20px auto;
 	border: solid 2px #ddd;
 }
+#title {
+	cursor: pointer;
+}
+#help {
+	overflow: hidden;
+	width: 480px;
+	margin: auto;
+	height: 0px;
+	background: #eee;
+	position: absolute;
+	left: 50%;
+	margin-left: -240px;
+	margin-top: -10px;
+	text-align: left;
+}
+#help ul {
+	margin: 20px;
+}
 #iwon {
 	display: none;
 	background: #5f5;
@@ -19,6 +37,10 @@ body {
 #uwon {
 	display: none;
 	background: #f55;
+}
+#draw {
+	display: none;
+	background: #55f;
 }
 .info {
 	width: 400px;

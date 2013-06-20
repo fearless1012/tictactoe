@@ -79,6 +79,8 @@ io.set('authorization', function (handshake, accept) {
 	}
 });
 
+io.of()
+
 io.sockets.on('connection', function(socket) {
 	var r = socket.handshake.session.room;
 	var uid = socket.handshake.sessionID;
@@ -103,7 +105,7 @@ io.sockets.on('connection', function(socket) {
 			if(res)	flag = true;
 			else flag = false;
 			socket.get(r,function(err,dest){
-				io.sockets.in(dest).emit('update', {
+				io.sockets.in(r).emit('update', {
 					status: flag,
 					expect: room.game.player(),
 					nextHadron: room.game.prev,
