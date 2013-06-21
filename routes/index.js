@@ -2,7 +2,7 @@ var Room = require('../room');
 exports.index = function(req, res){
 	res.render('home', { 
 		title: 'Ultimate Tic Tac Toe',
-		data: JSON.stringify(Room.collection)
+		data: JSON.stringify(Room.getOverview())
 	});
 };
 

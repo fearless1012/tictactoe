@@ -6,6 +6,19 @@ var Room = function(name) {
 	this.game = null;
 }
 Room.collection = {};
+Room.getOverview = function() {
+	var ret = [];
+	for(var i in Room.collection) {
+		if(Room.collection.hasOwnProperty(i)) {
+			ret.push({
+				name: Room.collection[i].roomname,
+				winner: Room.collection[i].winner,
+				isFull: Room.collection[i].isFull(),
+			});
+		}
+	}
+	return ret;
+}
 Room.addRoom = function(name) {
 	Room.collection[name] = new Room(name);
 }
