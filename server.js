@@ -44,9 +44,10 @@ var server = http.createServer(app),
 	io = socketio.listen(server),
 	parseCookie = connect.utils.parseSignedCookie;
 
-io.set("transports", ["websocket"]);
-
-io.set('log level', 2);
+io.configure(function() {
+	io.set("transports", ["websocket"]);
+	io.set('log level', 2);	
+});
 
 io.set('authorization', function (handshake, accept) {
 	if (handshake.headers.cookie) {
