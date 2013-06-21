@@ -45,7 +45,7 @@ var server = http.createServer(app),
 	parseCookie = connect.utils.parseSignedCookie;
 
 io.configure(function() {
-	io.set("transports", ["websocket"]);
+	// io.set("transports", ["websocket"]);
 	io.set('log level', 2);	
 });
 
