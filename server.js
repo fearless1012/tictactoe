@@ -35,18 +35,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 if ('development' == app.get('env')) {
   app.use(express.errorHandler());
 }
-app.get('/', routes.index);
-app.get('/users', user.list);
 
-app.get('/:room', function(req, res) {
-	if(!req.params['room']) return false;
-	var name=req.params['room'];
-	req.session.room = name;
-	res.render('index', {
-		title: "Ultimate Tic Tac Toe",
-		sid: name
-	})
-});
+//App.routes
+app.get('/', routes.index);
+app.get('/:room', routes.gameboard);
 
 var server = http.createServer(app),
 	io = socketio.listen(server),
@@ -71,7 +63,6 @@ io.set('authorization', function (handshake, accept) {
 				room = Room.getRoom(handshake.session.room);
 			}
 			if(room.isFull()) return accept('Room is FULL', false);
-			if(room.isComplete()) return accept('Game ended, Ask admin to delete', false);
 			handshake.room = room;
 			return accept(null,true);
 		})
@@ -79,8 +70,6 @@ io.set('authorization', function (handshake, accept) {
 		return accept('No cookie transmitted.', false);
 	}
 });
-
-io.of()
 
 io.sockets.on('connection', function(socket) {
 	var r = socket.handshake.session.room;
@@ -91,6 +80,7 @@ io.sockets.on('connection', function(socket) {
 	if(room.game === null) room.game = new game();
 	socket.on('disconnect', function() {
 		room.deleteUser(uid);
+		if(room.isEmpty()) Room.deleteRoom(r);
 	});
 	socket.emit('user', {
 		player: room.getPlayerCode(uid),

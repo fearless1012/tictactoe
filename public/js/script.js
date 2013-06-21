@@ -26,6 +26,7 @@ socket.on('user', function(data) {
 	var players = ['O', 'X'];
 	$("#player").html(players[p]);
 	UpdateGame(data);
+	$.Polling(false);
 });
 
 socket.on('update', function(data){
@@ -44,12 +45,12 @@ function UpdateGame(data) {
 		var players = ['O', 'X'];
 		if(data.state.winner === $.Player) {
 			$("#GAME").fadeOut(500,function() {
-				$("#iwon").html("<h1>YOU <br/>WIN :)</h1>").fadeIn(250);
+				$("#iwon").html("<h1>YOU<br/>WIN :)</h1>").fadeIn(250);
 			});
 		} else {
 			var p = $.Player === 0 ? 1:0;
 			$("#GAME").fadeOut(500,function() {
-				$("#uwon").html("<h1>Player "+players[p]+" wins :(</h1>").fadeIn(250);
+				$("#uwon").html("<h1>YOU<br/>LOSE</h1>").fadeIn(250);
 			});
 		}
 		return;
@@ -120,7 +121,7 @@ var QuarkView = Backbone.View.extend({
 	send: function() {
 		var x = this.model.get('x');
 		var y = this.model.get('y');
-		$.Polling(true)
+		$.Polling(true);
 		socket.emit('play', {
 			i: x,
 			j: y
@@ -158,10 +159,14 @@ var HadronView = Backbone.View.extend({
 		this.model.on('change',this.update,this);
 	},
 	update: function() {
-		if(this.model.get('here') === true) this.$el.css("background", "#dfd");
-		else this.$el.css("background",this.prevColor);
-		if(this.model.get('p') === 1) this.$el.css("border-color", "red");
-		else if(this.model.get('p') === 0) this.$el.css("border-color", "blue");
+		if(this.model.get('here') === true) this.$el.stop().animate({
+			opacity: 1, borderColor: "#555"
+		},"fast");
+		else this.$el.stop().animate({
+			opacity: 0.6, borderColor: this.prevColor
+		},100);
+		if(this.model.get('p') === 1) this.$el.css("background", "#faa");
+		else if(this.model.get('p') === 0) this.$el.css("background", "#aaf");
 	},
 	render: function() {
 		var x = this.model.get('x');
@@ -210,7 +215,6 @@ var PlayerView = Backbone.View.extend({});
 		$.Hadrons = new HadronCollection();
 		var bar = $("#GAME");
 		$.Status = function(state) {
-			console.log("asdf");
 			$.Polling(false);
 			var flag = false, timeout=500;
 			if(state) {
@@ -225,9 +229,9 @@ var PlayerView = Backbone.View.extend({});
 		}
 		$.Polling = function(state) {
 			if(state) {
-				$("#loadinggif").fadeIn(100);
+				$("#loadinggif").stop().fadeIn(100);
 			} else {
-				$("#loadinggif").fadeOut(100);
+				$("#loadinggif").stop().fadeOut(50);
 			}
 		}
 		new BoardView({

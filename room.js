@@ -9,6 +9,9 @@ Room.collection = {};
 Room.addRoom = function(name) {
 	Room.collection[name] = new Room(name);
 }
+Room.deleteRoom = function(name) {
+	delete Room.collection[name];
+}
 Room.getRoom = function(name) {
 	if('object' === typeof Room.collection[name])
 		return Room.collection[name];
@@ -19,6 +22,9 @@ Room.prototype.isComplete = function() {
 }
 Room.prototype.isFull = function() {
 	return this.isX() && this.isO();
+}
+Room.prototype.isEmpty = function() {
+	return this.playX === -1 && this.playO === -1;
 }
 Room.prototype.isX = function() {
 	return this.playX !== -1;

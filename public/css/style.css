@@ -7,10 +7,40 @@ body {
 	clear:both;
 }
 .container, .winner {
-	width: 366px;
-	height: 366px;
+	width: 330px;
+	height: 330px;
 	margin: 20px auto;
 	border: solid 2px #ddd;
+}
+.Tquark{
+	display: block;
+	width: 32px;
+	height: 32px;
+	border: solid 1px #ddd;
+	float: left;
+	line-height: 32px;
+	font-size: 32px;
+}
+.Tquark:hover { 
+	cursor: pointer; 
+	background: #3c7ebd;
+}
+.Thadron {
+	width: 102px;
+	border: solid 2px transparent;
+	margin: 2px;
+	float: left;
+}
+
+.Trow {
+	clear:both;
+}
+#loadinggif {
+	width: 330px;
+	height: 330px;
+	position: absolute;
+	background: #FFF url(../img/ajax-loader.gif) center center no-repeat;
+	opacity: 0.8;
 }
 #title {
 	cursor: pointer;
@@ -55,36 +85,4 @@ body {
 	text-align: center;
 	width: 360px;
 	margin: auto;
-}
-.Tquark{
-	display: block;
-	width: 30px;
-	height: 30px;
-	border: solid 1px transparent;
-	padding: 4px;
-	float: left;
-}
-.Tquark:hover { 
-	cursor: pointer; 
-	background: #3c7ebd;
-}
-.Thadron {
-	width: 120px;
-	border: solid 1px transparent;
-	float: left;
-}
-
-.Trow {
-	clear:both;
-}
-#loadinggif {
-	display: none;
-	position: fixed;
-	top:0;
-	left:0;
-	right:0;
-	height: 100%;
-	background: #FFF url(../img/loading.gif) center center no-repeat;
-	opacity: 0.2;
-	z-index: 100;
 }
