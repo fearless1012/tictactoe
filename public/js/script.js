@@ -120,6 +120,7 @@ var QuarkView = Backbone.View.extend({
 	send: function() {
 		var x = this.model.get('x');
 		var y = this.model.get('y');
+		$.Polling(true)
 		socket.emit('play', {
 			i: x,
 			j: y
@@ -209,6 +210,8 @@ var PlayerView = Backbone.View.extend({});
 		$.Hadrons = new HadronCollection();
 		var bar = $("#GAME");
 		$.Status = function(state) {
+			console.log("asdf");
+			$.Polling(false);
 			var flag = false, timeout=500;
 			if(state) {
 				bar.stop().animate({ borderColor: "#5f5" }, timeout/4, function(){
@@ -218,6 +221,13 @@ var PlayerView = Backbone.View.extend({});
 				bar.stop().animate({ borderColor: "#f55" }, timeout/4, function(){
 					$(this).stop().animate({ borderColor: "#ddd" }, timeout);
 				});
+			}
+		}
+		$.Polling = function(state) {
+			if(state) {
+				$("#loadinggif").fadeIn(100);
+			} else {
+				$("#loadinggif").fadeOut(100);
 			}
 		}
 		new BoardView({
