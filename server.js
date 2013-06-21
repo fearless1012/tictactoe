@@ -15,7 +15,8 @@ var SECRET = 'tic!tac!toe';
 var app = express();
 
 // all environments
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000);
+app.set('ip', process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1');
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.favicon());
@@ -23,7 +24,7 @@ app.use(express.favicon());
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser(SECRET));
-app.use(express.session({ 
+app.use(express.session({
 	secret: SECRET,
 	store: store,
 	key: 'tictactoe.sid'
@@ -117,6 +118,6 @@ io.sockets.on('connection', function(socket) {
 });
 
 app.use(app.router);
-server.listen(app.get('port'), function(){
+server.listen(app.get('port'), app.get('ip'),  function(){
 	console.log('Express server listening on port ' + app.get('port'));
 });
