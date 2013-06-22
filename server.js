@@ -46,7 +46,7 @@ var server = http.createServer(app),
 
 io.configure(function() {
 	io.set("transports", ["websocket"]);
-	io.set('log level', 2);	
+	io.set('log level', 2);
 });
 
 io.set('authorization', function (handshake, accept) {
