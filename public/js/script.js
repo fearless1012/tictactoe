@@ -24,7 +24,8 @@ var socket = io.connect(location.protocol + location.hostname);
 socket.on('user', function(data) {
 	var p = $.Player = data.player;
 	var players = ['O', 'X'];
-	$("#player").html(players[p]);
+	if($.Player === -1) $("#player").html("Guest");
+	else $("#player").html("Player " + players[p]);
 	UpdateGame(data);
 	$.Polling(false);
 });
@@ -40,18 +41,24 @@ socket.on('update', function(data){
 });
 
 function UpdateGame(data) {
+	var players = ['O', 'X'];
 	if(data.state.winner !== -1) {
 		//game over
-		var players = ['O', 'X'];
 		if(data.state.winner === $.Player) {
 			$("#GAME").fadeOut(500,function() {
 				$("#iwon").html("<h1>YOU<br/>WIN :)</h1>").fadeIn(250);
 			});
 		} else {
-			var p = $.Player === 0 ? 1:0;
-			$("#GAME").fadeOut(500,function() {
-				$("#uwon").html("<h1>YOU<br/>LOSE</h1>").fadeIn(250);
-			});
+			if($.Player === -1) {
+				var p = players[data.state.winner];
+				$("#GAME").fadeOut(500,function() {
+					$("#draw").html("<h1>"+p+"<br/>WINS</h1>").fadeIn(250);
+				});
+			} else {
+				$("#GAME").fadeOut(500,function() {
+					$("#uwon").html("<h1>YOU<br/>LOSE</h1>").fadeIn(250);
+				});
+			}
 		}
 		return;
 	}
@@ -69,7 +76,9 @@ function UpdateGame(data) {
 	if(data.expect === $.Player) {
 		$("#who").html("Your Turn");
 	} else {
-		$("#who").html("Opponent's Turn");
+		var p = players[data.expect];
+		if($.Player === -1) $("#who").html( "Player " + p + "'s turn");
+		else $("#who").html("Opponent's Turn");
 	}
 	var b = data.state.board;
 	$.each($.Hadrons.models, function(i,it) {
@@ -119,6 +128,7 @@ var QuarkView = Backbone.View.extend({
 		else if(p===1) this.$el.html("X");
 	},
 	send: function() {
+		if($.Player === -1) return;
 		var x = this.model.get('x');
 		var y = this.model.get('y');
 		$.Polling(true);
@@ -165,8 +175,8 @@ var HadronView = Backbone.View.extend({
 		else this.$el.stop().animate({
 			opacity: 0.6, borderColor: this.prevColor
 		},100);
-		if(this.model.get('p') === 1) this.$el.css("background", "#faa");
-		else if(this.model.get('p') === 0) this.$el.css("background", "#aaf");
+		if(this.model.get('p') === 1) this.$el.html("X");
+		else if(this.model.get('p') === 0) this.$el.html("O");
 	},
 	render: function() {
 		var x = this.model.get('x');
@@ -236,17 +246,6 @@ var PlayerView = Backbone.View.extend({});
 		}
 		new BoardView({
 			model: new Board()
-		});
-		var helpout = false;
-		$("#title").click(function(e){
-			e.preventDefault();
-			if(helpout) {
-				helpout = false;
-				$("#help").stop().animate({height: 0},250);
-			} else {
-				helpout = true;
-				$("#help").stop().animate({height: 150},250);
-			}
 		});
 	});
 }).apply(this,[]);

@@ -16,7 +16,7 @@ var app = express();
 
 // all environments
 app.set('port', process.env.OPENSHIFT_NODEJS_PORT || process.env.PORT || 3000);
-app.set('ip', process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1');
+app.set('ip', process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0');
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.favicon());
@@ -65,7 +65,7 @@ io.set('authorization', function (handshake, accept) {
 				Room.addRoom(handshake.session.room);
 				room = Room.getRoom(handshake.session.room);
 			}
-			if(room.isFull()) return accept('Room is FULL', false);
+			// if(room.isFull()) return accept('Room is FULL', false);
 			handshake.room = room;
 			return accept(null,true);
 		})
@@ -88,13 +88,14 @@ io.sockets.on('connection', function(socket) {
 	socket.emit('user', {
 		player: room.getPlayerCode(uid),
 		expect: room.game.player(),
-		nextHadron: room.game.prev,
+		nextHadron: room.game.nextHadron(),
 		state: room.game.getState()
 	});
 	socket.on('play', function(data) {
 		if(room.game !== null) {
 			var p = room.getPlayerCode(uid);
-			if(p===-1) console.log("Shouldn't happen");
+			// if some other player requested a move
+			if(p===-1) return;
 			var res = room.game.setQuark(data.i,data.j,p), flag = false;
 			if(res)	flag = true;
 			else flag = false;
@@ -102,7 +103,7 @@ io.sockets.on('connection', function(socket) {
 				io.sockets.in(r).emit('update', {
 					status: flag,
 					expect: room.game.player(),
-					nextHadron: room.game.prev,
+					nextHadron: room.game.nextHadron(),
 					state: room.game.getState()
 				});
 			});

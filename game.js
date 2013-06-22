@@ -81,13 +81,19 @@ game.prototype.pp = 0;
 game.prototype.changePlayer = function() {
 	if(this.pp === 0) this.pp = 1;
 	else if(this.pp === 1) this.pp = 0;
-	else console.log("This shouldn't Happen. Third player entered room.");
+	else console.log("This shouldn't Happen. Third player authorized.");
 };
 game.prototype.player = function() {
 	if(this.pp === 0) return 1;
 	else if(this.pp === 1) return 0;
-	else console.log("This shouldn't happen. Third player entered room.");
+	else console.log("This shouldn't happen. Third player authorized.");
 };
+game.prototype.nextHadron = function() {
+	if(this.prev === -1) return -1;
+	if(this.board.data[this.prev].isFull()) return -1;
+	if(this.board.data[this.prev].winner !== -1) return -1;
+	return this.prev;
+}
 game.prototype.setQuark = function(i,j,p,callback) {
 	i = Default(i,-1),
 	j = Default(j,-1),
@@ -98,6 +104,7 @@ game.prototype.setQuark = function(i,j,p,callback) {
 	var hadron = this.board.data[i],
 		quark = hadron.data[j];
 
+	if(p===-1) return false;
 	//if the current player is not playing
 	if(this.player() !== p) return false;
 	if(prev === -1) {
@@ -108,6 +115,7 @@ game.prototype.setQuark = function(i,j,p,callback) {
 		//the opponent has chosen the right hadron
 		//if opponent fell into a conquered hadron
 		if(hadron.winner !== -1) {
+			return false;
 			//if the hadron is full, an illegal request has come
 			if(hadron.isFull()) return false;
 			//so now it's not full
@@ -116,8 +124,8 @@ game.prototype.setQuark = function(i,j,p,callback) {
 			if(quark.winner !== -1) return false;
 		}
 	} else {
-		if(this.board.data[prev].isFull()) {
-			if(hadron.winner != -1){
+		if(this.board.data[prev].isFull() || this.board.data[prev].winner !== -1) {
+			if(hadron.winner !== -1){
 				if(hadron.isFull()) return false;
 				if(quark.winner !== -1) return false;
 			} else {

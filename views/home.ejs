@@ -1,6 +1,44 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+<head>
+	<title><%= title %></title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/css/bootstrap.min.css" />
+</head>
 <body>
-	<%= data %>
+	<div class="container">
+		<div class="hero-unit">
+			<h1><%= title %></h1>
+			<p>The Game is based on the idea discussed 
+				<a href="http://mathwithbaddrawings.com/2013/06/16/ultimate-tic-tac-toe/" target="_blank">here</a>.</p>
+		</div>
+		<table class="table table-striped">
+			<thead>
+				<tr><th>#</th><th>Room Name</th><th>Status</th><th>Action</th></tr>
+			</thead>
+			<tbody id="games">
+
+			</tbody>
+		</table>
+		<div class="well">
+			<h5>README</h5>
+			<ul>
+				<li>To create a new room, append some text to the URL. Or, let me do that for you. <a href="<%= rand %>" id="newgame" target="_blank">Click here</a>.</li>
+				<li>When the room has no active players for sometime, it'll be <span class="label label-important"> deleted</span> automatically.</li>
+				<li>Action: <span class="btn-small btn-success">Join</span> <i class="icon-arrow-right"></i> The Room needs one more player.</li>
+				<li>Action: <span class="btn-small btn-warning">View</span> <i class="icon-arrow-right"></i> The Room is already full. But you can view the game play <span class="label label-info">live</span>.</li>
+			</ul>
+
+		</div>
+	</div>
+	<script src="/js/jquery.min.js"></script>
+	<script src="/js/bootstrap.min.js"></script>
+	<script>
+	var DATA;
+	$(function() {
+		DATA = JSON.parse($("<div/>").html("<%= data %>").text());
+	});
+	</script>
+	<script src="/js/homepage.js"></script>
 </body>
 </html>

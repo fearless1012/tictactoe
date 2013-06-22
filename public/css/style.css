@@ -26,6 +26,7 @@ body {
 	background: #3c7ebd;
 }
 .Thadron {
+	font-size: 73px;
 	width: 102px;
 	border: solid 2px transparent;
 	margin: 2px;
@@ -44,21 +45,6 @@ body {
 }
 #title {
 	cursor: pointer;
-}
-#help {
-	overflow: hidden;
-	width: 480px;
-	margin: auto;
-	height: 0px;
-	background: #eee;
-	position: absolute;
-	left: 50%;
-	margin-left: -240px;
-	margin-top: -10px;
-	text-align: left;
-}
-#help ul {
-	margin: 20px;
 }
 #iwon {
 	display: none;
