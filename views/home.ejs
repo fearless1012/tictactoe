@@ -4,6 +4,13 @@
 	<title><%= title %></title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="/css/DT_bootstrap.css" />
+	<style>
+	#games {
+		max-height: 100px;
+		overflow-y: scroll;
+	}
+	</style>
 </head>
 <body>
 	<div class="container">
@@ -12,7 +19,7 @@
 			<p>The Game is based on the idea discussed 
 				<a href="http://mathwithbaddrawings.com/2013/06/16/ultimate-tic-tac-toe/" target="_blank">here</a>.</p>
 		</div>
-		<table class="table table-striped">
+		<table class="table table-striped" id="gamestable">
 			<thead>
 				<tr><th>#</th><th>Room Name</th><th>Status</th><th>Action</th></tr>
 			</thead>
@@ -22,11 +29,17 @@
 		</table>
 		<div class="well">
 			<h5>README</h5>
+			<h6>WHAT</h6>
 			<ul>
 				<li>To create a new room, append some text to the URL. Or, let me do that for you. <a href="<%= rand %>" id="newgame" target="_blank">Click here</a>.</li>
-				<li>When the room has no active players for sometime, it'll be <span class="label label-important"> deleted</span> automatically.</li>
 				<li>Action: <span class="btn-small btn-success">Join</span> <i class="icon-arrow-right"></i> The Room needs one more player.</li>
 				<li>Action: <span class="btn-small btn-warning">View</span> <i class="icon-arrow-right"></i> The Room is already full. But you can view the game play <span class="label label-info">live</span>.</li>
+			</ul><h6>HOW</h6>
+			<ul>
+				<li>When there is no one in the Room, and you Join, you become <span class="label label-info">Player X</span>. So, in any room, <span class="label label-info">Player X</span> starts the game.</li>
+				<li>When <span class="label label-info">Player X</span> is in the Room, and you Join, you become <span class="label label-info">Player O</span></li>
+				<li>When the Room is <strong>Full</strong>, and you Join, you become a guest and you can view the game play live.</li>
+				<li>When the room has no active players for sometime, it'll be <span class="label label-important"> deleted</span> automatically.</li>
 			</ul>
 
 		</div>
@@ -39,6 +52,8 @@
 		DATA = JSON.parse($("<div/>").html("<%= data %>").text());
 	});
 	</script>
+	<script src="/js/jquery.dataTables.min.js"></script>
+	<script src="/js/DT_bootstrap.js"></script>
 	<script src="/js/homepage.js"></script>
 </body>
 </html>
