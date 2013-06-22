@@ -12,7 +12,7 @@ Room.getOverview = function() {
 		if(Room.collection.hasOwnProperty(i)) {
 			ret.push({
 				name: Room.collection[i].roomname,
-				winner: Room.collection[i].game.board.winner,
+				winner: Room.collection[i].game ? Room.collection[i].game.board.winner : -1,
 				isFull: Room.collection[i].isFull(),
 			});
 		}
