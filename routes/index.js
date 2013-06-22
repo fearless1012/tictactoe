@@ -17,12 +17,14 @@ exports.index = function(req, res){
 		rand: randomString()
 	});
 };
+
 exports.gameboard = function(req, res) {
 	if(!req.params['room']) return false;
 	var name=req.params['room'];
 	req.session.room = name;
 	res.render('index', {
 		title: "Ultimate Tic Tac Toe",
-		sid: name
+		sid: name,
+		hostname: req.get('host').split(':')[0]
 	})
 };

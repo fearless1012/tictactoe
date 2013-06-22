@@ -6,7 +6,7 @@ var connect = require('express/node_modules/connect'),
 	http = require('http'),
 	path = require('path'),
 	socketio = require('socket.io'),
-	store = new express.session.MemoryStore();
+	store = new express.session.MemoryStore(),
 	game = require('./game.js'),
 	Room = require('./room.js');
 
@@ -41,7 +41,7 @@ app.get('/', routes.index);
 app.get('/:room', routes.gameboard);
 
 var server = http.createServer(app),
-	io = socketio.listen(server),
+	io = socketio.listen(8000),
 	parseCookie = connect.utils.parseSignedCookie;
 
 io.configure(function() {
