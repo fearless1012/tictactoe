@@ -22,7 +22,7 @@ exports.gameboard = function(req, res) {
 	if(!req.params['room']) return false;
 	var name=req.params['room'];
 	req.session.room = name;
-	var port req.app.get('port');
+	var port = req.app.get('port');
 	if(typeof process.env.OPENSHIFT_NODEJS_PORT !== "undefined") port="8000";
 	res.render('index', {
 		title: "Ultimate Tic Tac Toe",
