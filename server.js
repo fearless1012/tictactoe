@@ -41,7 +41,7 @@ app.get('/', routes.index);
 app.get('/:room', routes.gameboard);
 
 var server = http.createServer(app),
-	io = socketio.listen(8000),
+	io = socketio.listen(server),
 	parseCookie = connect.utils.parseSignedCookie;
 
 io.configure(function() {

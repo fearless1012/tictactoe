@@ -19,7 +19,9 @@ jQuery.fn.enableTextSelect = function() {
 };
 
 //create socket first
-var socket = io.connect(location.protocol + location.hostname + ":8000");
+//NOTE : PORT 8000 is for OPENSHIFT HOSTING ONLY
+var _openshift_port = ":8000";
+var socket = io.connect(location.protocol + location.hostname + _openshift_port);
 
 socket.on('user', function(data) {
 	var p = $.Player = data.player;
