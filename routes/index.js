@@ -25,6 +25,7 @@ exports.gameboard = function(req, res) {
 	res.render('index', {
 		title: "Ultimate Tic Tac Toe",
 		sid: name,
-		hostname: req.get('host').split(':')[0]
+		hostname: req.get('host').split(':')[0],
+		port: req.app.get('port')
 	})
 };

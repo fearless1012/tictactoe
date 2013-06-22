@@ -20,7 +20,6 @@ jQuery.fn.enableTextSelect = function() {
 
 //create socket first
 //NOTE : PORT 8000 is for OPENSHIFT HOSTING ONLY
-var _openshift_port = ":8000";
 var socket = io.connect(location.protocol + location.hostname + _openshift_port);
 
 socket.on('user', function(data) {
